@@ -94,6 +94,8 @@ def main():
     hf_models = get_available_hf_models()
     hf_model_name = st.sidebar.selectbox("Transformers 模型 (首次載入需等待下載)", hf_models, index=0, disabled=not use_hf)
     max_len = st.sidebar.slider("長文截斷 (chars)", min_value=500, max_value=4000, value=2000, step=100)
+    if use_hf:
+        st.sidebar.info("Transformers 首次載入需下載模型，請耐心等候；若環境受限請改用 Baseline。")
 
     st.sidebar.markdown("---")
     st.sidebar.caption("檔案大小限制 2 MB；長文會截斷/分段平均。")

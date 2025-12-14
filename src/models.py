@@ -90,6 +90,7 @@ def predict_proba(model, text: str, use_hf: bool = False) -> Dict[str, float]:
 def get_available_hf_models() -> List[str]:
     # Keep list short; user can edit README to add more.
     return [
+        "hf-internal-testing/tiny-random-distilbert",  # ultra-small for demo, downloads fast
         "distilbert-base-uncased-finetuned-sst-2-english",  # small, downloads faster
         "distilroberta-base",
         "roberta-base-openai-detector",
