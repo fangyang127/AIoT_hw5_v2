@@ -47,7 +47,13 @@ def load_hf_model(model_name: str):
     from transformers import pipeline
 
     logger.info("Loading HF model: %s", model_name)
-    return pipeline("text-classification", model=model_name, device_map="auto" if model_name else None)
+    # Force CPU to avoid GPU/driver issues on hosted envs; enable low memory usage when possible.
+    return pipeline(
+        "text-classification",
+        model=model_name,
+        device_map="cpu",
+        model_kwargs={"low_cpu_mem_usage": True},
+    )
 
 
 def map_hf_labels(label: str) -> Dict[str, float]:
@@ -84,6 +90,7 @@ def predict_proba(model, text: str, use_hf: bool = False) -> Dict[str, float]:
 def get_available_hf_models() -> List[str]:
     # Keep list short; user can edit README to add more.
     return [
-        "roberta-base-openai-detector",
+        "distilbert-base-uncased-finetuned-sst-2-english",  # small, downloads faster
         "distilroberta-base",
+        "roberta-base-openai-detector",
     ]

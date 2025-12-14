@@ -92,7 +92,7 @@ def main():
     model_source = st.sidebar.radio("模型類型", ["Baseline (TF-IDF + LR)", "Transformers"])
     use_hf = model_source.startswith("Transformers")
     hf_models = get_available_hf_models()
-    hf_model_name = st.sidebar.selectbox("Transformers 模型", hf_models, index=0)
+    hf_model_name = st.sidebar.selectbox("Transformers 模型 (首次載入需等待下載)", hf_models, index=0, disabled=not use_hf)
     max_len = st.sidebar.slider("長文截斷 (chars)", min_value=500, max_value=4000, value=2000, step=100)
 
     st.sidebar.markdown("---")
