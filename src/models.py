@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -44,7 +44,11 @@ def load_baseline_model():
 
 
 def load_hf_model(model_name: str):
-    from transformers import pipeline
+    try:
+        from transformers import pipeline  # type: ignore
+    except Exception as exc:
+        logger.warning("Transformers not available: %s", exc)
+        return None
 
     logger.info("Loading HF model: %s", model_name)
     # Force CPU to avoid GPU/driver issues on hosted envs; enable low memory usage when possible.
@@ -71,6 +75,9 @@ def map_hf_labels(label: str) -> Dict[str, float]:
 
 def predict_proba(model, text: str, use_hf: bool = False) -> Dict[str, float]:
     if use_hf:
+        if model is None:
+            # Fallback probability when HF unavailable
+            return {"ai": 0.5, "human": 0.5}
         outputs = model(text, truncation=True, max_length=512)
         result = outputs[0] if isinstance(outputs, list) else outputs
         mapped = map_hf_labels(result["label"])
@@ -88,6 +95,10 @@ def predict_proba(model, text: str, use_hf: bool = False) -> Dict[str, float]:
 
 
 def get_available_hf_models() -> List[str]:
+    try:
+        import transformers  # type: ignore
+    except Exception:
+        return []
     # Keep list short; user can edit README to add more.
     return [
         "hf-internal-testing/tiny-random-distilbert",  # ultra-small for demo, downloads fast

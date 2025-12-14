@@ -89,13 +89,22 @@ def main():
         st.info(f"已載入範例：{sample_choice}")
 
     st.sidebar.header("模型選擇")
-    model_source = st.sidebar.radio("模型類型", ["Baseline (TF-IDF + LR)", "Transformers"])
-    use_hf = model_source.startswith("Transformers")
     hf_models = get_available_hf_models()
-    hf_model_name = st.sidebar.selectbox("Transformers 模型 (首次載入需等待下載)", hf_models, index=0, disabled=not use_hf)
+    hf_available = len(hf_models) > 0
+    model_options = ["Baseline (TF-IDF + LR)"] + (["Transformers"] if hf_available else [])
+    model_source = st.sidebar.radio("模型類型", model_options)
+    use_hf = model_source.startswith("Transformers")
+    hf_model_name = st.sidebar.selectbox(
+        "Transformers 模型 (首次載入需等待下載)",
+        hf_models if hf_models else ["(未安裝 transformers)"],
+        index=0,
+        disabled=not use_hf or not hf_available,
+    )
     max_len = st.sidebar.slider("長文截斷 (chars)", min_value=500, max_value=4000, value=2000, step=100)
     if use_hf:
         st.sidebar.info("Transformers 首次載入需下載模型，請耐心等候；若環境受限請改用 Baseline。")
+    if not hf_available:
+        st.sidebar.warning("未安裝 transformers/torch，已自動隱藏 Transformers 模式。")
 
     st.sidebar.markdown("---")
     st.sidebar.caption("檔案大小限制 2 MB；長文會截斷/分段平均。")
